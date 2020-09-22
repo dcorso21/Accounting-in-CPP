@@ -7,11 +7,9 @@
 using namespace std;
 
 bool included(vector<string> vector_arr, string value){
-    bool exists = any_of(begin(vector_arr), end(vector_arr), [&](string s)
-    {
-        return s == value;
-    });
+    return count(vector_arr.begin(), vector_arr.end(), value);
 }
+
 
 class RecordsManager
 {
@@ -23,13 +21,21 @@ private:
 public:
     RecordsManager() : fileName("records.csv") {}
 
-    // vector<string> parseCSVLine(string line){
-    //     for (int i = 0; i < line.length(); i++)
-    //     {
-
-    //     }
+    vector<string> parseCSVLine(string line){
+        vector<string> values;
+        string currentWord = "";
+        for (int i = 0; i < line.length(); i++)
+        {
+            if (line[i] != ' ' && line[i] != ','){
+                currentWord += line[i];
+            } else
+            {
+                values.push_back(currentWord);
+            }
+            
+        }
         
-    // }
+    }
 
     void initRecs()
     {
@@ -147,7 +153,7 @@ int main()
     // manage.initRecs();
     // manage.addEntry("David", "Corson", "Deposit", "1200", "9/22/20");
     // vector<string> data = manage.loadData();
-    manage.read_record();
+    // manage.read_record();
 
     return 0;
 }
