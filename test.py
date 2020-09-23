@@ -1,11 +1,10 @@
 
-def givearray():
-    return [1,2,3,4]
-    
+def foo(x) -> str:
+    print(x)
+    return x+'!!!'
 
-s = givearray()
 
-for i in s:
-    print(i)
-    
-print(givearray)
+print('hello')
+s = foo('world')
+
+print(s)
