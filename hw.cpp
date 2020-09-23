@@ -17,6 +17,10 @@ bool included(vector<string> vector_arr, string value)
     return count(vector_arr.begin(), vector_arr.end(), value);
 }
 
+
+/** 
+ * @brief Funcs for app that will handle database through terminal
+ */
 class RecordsManager
 {
 private:
@@ -68,6 +72,9 @@ vector<string> RecordsManager::parseCSVLine(string line)
     return values;
 }
 
+/** 
+ * @brief Reset database
+ */
 void RecordsManager::initRecs()
 {
     recordWrite.open("records.csv");
@@ -75,11 +82,17 @@ void RecordsManager::initRecs()
     recordWrite.close();
 }
 
+/** 
+ * @brief Converts category string from class to a vector
+ */
 vector<string> RecordsManager::categoryVector()
 {
     return parseCSVLine(categories);
 }
 
+/** 
+ * @brief adds an entry to the record database and writes to file
+ */
 void RecordsManager::addEntry(string firstName, string lastName, string type, int amount, string date)
 {
     //  The Python in me wanted to do it this way, but I learned about sstream from the GeeksforGeeks below
@@ -100,6 +113,9 @@ void RecordsManager::addEntry(string firstName, string lastName, string type, in
     recordWrite.close();
 }
 
+/** 
+ * @brief User interface console oriented function to add a user through terminal
+ */
 void RecordsManager::manualEntry(){
     string firstName, lastName, type, date;
     int amount, typeEntry;
@@ -150,6 +166,9 @@ void RecordsManager::manualEntry(){
 
 }
 
+/** 
+ * @brief Prints an entry in the database in a pivot-table view
+ */
 void RecordsManager::printEntry(string firstName, string lastName, string type, int amount, string date){
     cout << left << setw(40) << setfill('_') << "First Name: " << firstName << endl
          << left << setw(40) << setfill('_') << "Last Name: " << lastName << endl
@@ -158,6 +177,10 @@ void RecordsManager::printEntry(string firstName, string lastName, string type, 
          << left << setw(40) << setfill('_') << "Date: " << date;
 }
 
+
+/** 
+ * @brief loadData Initializes a data object array in the Class for use
+ */
 void RecordsManager::loadData()
 {
     // Open the data
@@ -179,13 +202,16 @@ void RecordsManager::loadData()
 }
 
 /** 
- * @brief modified from source at https://www.geeksforgeeks.org/csv-file-management-using-c/
- * 
+ * @brief Potenatially deprecated func that will search for a value in db
+ * @param category {string} the category to look up - potentially deprectaed once app becomes more interactive
  */
 void RecordsManager::readRecord(string category)
 {
 }
 
+/**
+ * @brief Print out a single row's worth of data from the `printData` Function
+ */
 void printVector(vector<string> v, bool newLine, string sep)
 {
     for (int i = 0; i < v.size(); i++)
@@ -213,6 +239,9 @@ void printVector(vector<string> v, bool newLine, string sep)
     }
 }
 
+/**
+ * @brief Prints out display of all data entries in console
+ */
 void RecordsManager::printData()
 {
     for (int i = 0; i < data.size(); i++)
@@ -223,6 +252,9 @@ void RecordsManager::printData()
     return;
 }
 
+/**
+ * @brief Clears Console screen (not working yet for my computer before exe created)
+ */
 void RecordsManager::clearConsole(){
     cout << flush;
 
