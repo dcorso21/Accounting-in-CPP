@@ -21,19 +21,20 @@ private:
     ofstream recordWrite;
     ifstream recordRead;
     string fileName;
-    vector<vector<string>> data;
-    string categories;
 
 public:
+    vector<vector<string> > data;
+    string categories;
     RecordsManager() : fileName("records.csv"),
                        categories("firstName, lastName, type, amount, date") {};
 
     vector<string> parseCSVLine(string line);
     void initRecs();
-    string categoryArray();
+    vector<string> categoryVector();
     void addEntry(string firstName, string lastName, string type, int amount, string date);
     void loadData();
     void readRecord(string category);
+    void printData();
 };
 /**
  * @brief This takes a string in CSV format and returns a vector of the items
@@ -67,8 +68,8 @@ void RecordsManager::initRecs()
     recordWrite.close();
 }
 
-string RecordsManager::categoryArray(){
-    return
+vector<string> RecordsManager::categoryVector(){
+    return parseCSVLine(categories);
 }
 
 void RecordsManager::addEntry(string firstName, string lastName, string type, int amount, string date)
@@ -98,7 +99,7 @@ void RecordsManager::loadData()
 
     string line;
     vector<string> row;
-    vector<vector<string>> frame;
+    vector<vector<string> > frame;
     // While there is still data to output
     while (!recordRead.eof())
     {
@@ -107,6 +108,7 @@ void RecordsManager::loadData()
         frame.push_back(row);
     }
     recordRead.close();
+    //load frame to data file. 
     data = frame;
 }
 
@@ -118,9 +120,37 @@ void RecordsManager::readRecord(string category)
 {
 }
 
+void printVector(vector<string> v, bool newLine, string sep){
+    for (int i = 0; i < v.size(); i++)
+    {
+        if (i == v.size() -1){
+            sep = "";
+        }
+        string element = v[i] + sep;
+        if (newLine){
+            cout << element << endl;
+        }else
+        {
+            cout << element;
+        }
+    }
+}
+void RecordsManager::printData(){
+    for (int i = 0; i < data.size(); i++)
+    {   
+       printVector(data[i], false, " ");
+       cout << endl;
+    }
+    
+    return;
+}
 
 int main()
 {
     RecordsManager manage;
+    // manage.addEntry("Andreia", "Biagioni", "Withdrawal", 1400, "10/19/2019");
+    // manage.printData();
+    manage.loadData();
+    manage.printData();
     return 0;
 }
