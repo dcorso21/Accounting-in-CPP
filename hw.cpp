@@ -1,15 +1,19 @@
+/**
+ * Found an interesting c++ project at https://www.codewithc.com/c-projects-with-source-code/
+ * Got a lot of help with CSV parsing at https://www.geeksforgeeks.org/csv-file-management-using-c/
+ * 
+ */
 #include <iostream>
 #include <string>
 #include <vector>
 #include <fstream>
 #include <sstream>
-
 using namespace std;
 
-bool included(vector<string> vector_arr, string value){
+bool included(vector<string> vector_arr, string value)
+{
     return count(vector_arr.begin(), vector_arr.end(), value);
 }
-
 
 class RecordsManager
 {
@@ -17,143 +21,106 @@ private:
     ofstream recordWrite;
     ifstream recordRead;
     string fileName;
+    vector<vector<string>> data;
+    string categories;
 
 public:
-    RecordsManager() : fileName("records.csv") {}
+    RecordsManager() : fileName("records.csv"),
+                       categories("firstName, lastName, type, amount, date") {};
 
-    vector<string> parseCSVLine(string line){
-        vector<string> values;
-        string currentWord = "";
-        for (int i = 0; i < line.length(); i++)
-        {
-            if (line[i] != ' ' && line[i] != ','){
-                currentWord += line[i];
-            } else
-            {
-                values.push_back(currentWord);
-            }
-            
-        }
-        
-    }
-
-    void initRecs()
-    {
-        recordWrite.open("records.csv");
-        recordWrite << "firstName, lastName, type, amount, date";
-        recordWrite.close();
-    }
-
-    void addEntry(string firstName, string lastName, string type, int amount, string date)
-    {
-        //  The Python in me wanted to do it this way, but I learned about sstream from the GeeksforGeeks below
-        // string entry = firstName + ", " + lastName + ", " + type + ", " + amount + ", " + date + "\n";
-
-        stringstream entry;
-        entry << firstName + ", "
-              << lastName + ", "
-              << type + ", "
-              << amount
-              << ", "
-              << date + "\n";
-
-        //Open to Append
-        recordWrite.open(fileName, ios::out | ios::app);
-        recordWrite << endl
-                    << entry.str();
-        recordWrite.close();
-    }
-
-    vector<string> loadData()
-    {
-        vector<string> dataEntry;
-        string item;
-        recordRead.open(fileName);
-        while (!recordRead.eof())
-        {
-            recordRead >> item;
-            dataEntry.push_back(item);
-        }
-        recordRead.close();
-        return dataEntry;
-    }
-    /** 
-     * @brief modified from source at https://www.geeksforgeeks.org/csv-file-management-using-c/
-     * 
-     */
-    void read_record()
-    {
-        // Open the data
-        recordRead.open(fileName, ios::in);
-
-        // Ask and pick which value to search for
-        int rollnum, roll2, count = 0;
-        // cout << "Enter the roll number "
-        //      << "of the student to display details: ";
-        // cin >> rollnum;
-
-        // Read the Data from the file
-        // as String Vector
-        vector<string> row;
-        string line, word, temp;
-
-        // While there is still data to output
-        while (!recordRead.eof())
-        {
-
-            // Empty the vector at the beginning of each loop
-            row.clear();
-
-            // read an entire row and
-            // store it in a string variable 'line'
-            getline(recordRead, line);
-            // used for breaking words
-
-            stringstream s;
-            s << line;
-            cout << s.str();
-            return;
-
-            // read every column data of a row and
-            // store it in a string variable, 'word'
-            // while (getline(s, word, ', '))
-            // {
-
-            //     // add all the column data
-            //     // of a row to a vector
-            //     row.push_back(word);
-            // }
-
-            // // convert string to integer for comparision
-            // roll2 = stoi(row[0]);
-
-            // // Compare the roll number
-            // if (roll2 == rollnum)
-            // {
-
-            //     // Print the found data
-            //     count = 1;
-            //     cout << "Details of Roll " << row[0] << " : \n";
-            //     cout << "Name: " << row[1] << "\n";
-            //     cout << "Maths: " << row[2] << "\n";
-            //     cout << "Physics: " << row[3] << "\n";
-            //     cout << "Chemistry: " << row[4] << "\n";
-            //     cout << "Biology: " << row[5] << "\n";
-            //     break;
-            // }
-        }
-        // if (count == 0)
-        //     cout << "Record not found\n";
-    }
+    vector<string> parseCSVLine(string line);
+    void initRecs();
+    string categoryArray();
+    void addEntry(string firstName, string lastName, string type, int amount, string date);
+    void loadData();
+    void readRecord(string category);
 };
+/**
+ * @brief This takes a string in CSV format and returns a vector of the items
+ * @param line {string}
+ */
+vector<string> RecordsManager::parseCSVLine(string line)
+{
+    vector<string> values;
+    string currentWord = "";
+    for (int i = 0; i < line.length(); i++)
+    {
+        if (line[i] != ' ' && line[i] != ',')
+        {
+            currentWord += line[i];
+        }
+        else
+        {
+            values.push_back(currentWord);
+            currentWord = "";
+        }
+    }
+    // Adds last word
+    values.push_back(currentWord);
+    return values;
+}
+
+void RecordsManager::initRecs()
+{
+    recordWrite.open("records.csv");
+    recordWrite << "firstName, lastName, type, amount, date";
+    recordWrite.close();
+}
+
+string RecordsManager::categoryArray(){
+    return
+}
+
+void RecordsManager::addEntry(string firstName, string lastName, string type, int amount, string date)
+{
+    //  The Python in me wanted to do it this way, but I learned about sstream from the GeeksforGeeks below
+    // string entry = firstName + ", " + lastName + ", " + type + ", " + amount + ", " + date + "\n";
+
+    stringstream entry;
+    entry << firstName + ", "
+            << lastName + ", "
+            << type + ", "
+            << amount
+            << ", "
+            << date;
+
+    //Open to Append
+    recordWrite.open(fileName, ios::out | ios::app);
+    recordWrite << endl
+                << entry.str();
+    recordWrite.close();
+}
+
+void RecordsManager::loadData()
+{
+    // Open the data
+    recordRead.open(fileName, ios::in);
+
+    string line;
+    vector<string> row;
+    vector<vector<string>> frame;
+    // While there is still data to output
+    while (!recordRead.eof())
+    {
+        getline(recordRead, line);
+        row = parseCSVLine(line);
+        frame.push_back(row);
+    }
+    recordRead.close();
+    data = frame;
+}
+
+/** 
+ * @brief modified from source at https://www.geeksforgeeks.org/csv-file-management-using-c/
+ * 
+ */
+void RecordsManager::readRecord(string category)
+{
+}
+
 
 int main()
 {
     RecordsManager manage;
-    // manage.initRecs();
-    // manage.addEntry("David", "Corson", "Deposit", "1200", "9/22/20");
-    // vector<string> data = manage.loadData();
-    // manage.read_record();
-
     return 0;
 }
