@@ -22,3 +22,16 @@ stringstream, std::cout and std::cin and more. Pretty simple stuff, but I'm pret
 ### Features:
 
 #### Display Database
+
+
+![Alt Text](https://github.com/dcorso21/Accounting-in-CPP/blob/master/readme_gifs/display.gif)
+
+#### Add Entry
+
+![Alt Text](https://github.com/dcorso21/Accounting-in-CPP/blob/master/readme_gifs/entry.gif)
+
+#### Remove Entry
+
+![Alt Text](https://github.com/dcorso21/Accounting-in-CPP/blob/master/readme_gifs/remove.gif)
+
+All Changes are immediately reflected in the database at records.csv
