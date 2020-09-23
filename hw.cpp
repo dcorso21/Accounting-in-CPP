@@ -3,6 +3,7 @@
  * Got a lot of help with CSV parsing at https://www.geeksforgeeks.org/csv-file-management-using-c/
  * 
  */
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -45,6 +46,8 @@ public:
     void printData();
     void clearConsole();
     void manualDeleteEntry();
+    void deleteEntry(int entryIndex);
+    void updateFromData();
     void MainMenu();
 };
 /**
@@ -78,6 +81,39 @@ vector<string> RecordsManager::parseCSVLine(string line)
     return values;
 }
 
+/**
+ * @brief Print out a single row's worth of data from the `printData` Function
+ */
+void printVector(vector<string> v, bool newLine, string sep, int index)
+{
+    for (int i = 0; i < v.size(); i++)
+    {
+        // if there is some space between values
+        if (v[i] == " "){continue;}
+        // it is the last element in the array
+        if (i == v.size() - 1){sep = "";}
+        string element = v[i] + sep;
+        if (i == 0){
+            string count = index != 0? to_string(index)+") " : "   ";
+            cout << count;
+        }
+        if (newLine)
+        {
+            cout << left         // Aligns Left (I found this solution at https://stackoverflow.com/questions/14765155/how-can-i-easily-format-my-data-table-in-c)
+                 << setw(6)      // sets width between elements on a line?
+                 << setfill(' ') // fills the blank spaces
+                 << element
+                 << endl;
+        }
+        else
+        {
+            cout << left         // Aligns Left
+                 << setw(12)      // sets width between elements on a line?
+                 << setfill(' ') // fills the blank spaces
+                 << element;
+        }
+    }
+}
 
 void RecordsManager::MainMenu(){
     loadData();
@@ -92,6 +128,7 @@ void RecordsManager::MainMenu(){
     {
     case (1):
         printData();
+        MainMenu();
         break;
     case (2):
         manualEntry();
@@ -112,7 +149,7 @@ void RecordsManager::MainMenu(){
  */
 void RecordsManager::resetRecords()
 {
-    recordWrite.open("records.csv");
+    recordWrite.open(fileName);
     recordWrite << "firstName, lastName, type, amount, date";
     recordWrite.close();
 }
@@ -228,6 +265,7 @@ void RecordsManager::manualDeleteEntry(){
     switch (confirmation)
     {
         case (1):
+            deleteEntry(response);
             cout << "\nEntry has been deleted, press any button to return to Main\n";
             cin >> exit;
             clearConsole();
@@ -237,6 +275,26 @@ void RecordsManager::manualDeleteEntry(){
             MainMenu();
             break;
     }
+}
+
+void RecordsManager::deleteEntry(int entryIndex){
+    data.erase(data.begin() + entryIndex);
+    updateFromData();
+}
+
+void RecordsManager::updateFromData(){
+    resetRecords();
+    string firstName, lastName, type, amount, date;
+    for (int i = 1; i < data.size(); i++)
+    {
+        firstName = data[i][0],
+        lastName = data[i][1],
+        type = data[i][2],
+        amount = data[i][3],
+        date = data[i][4],
+        addEntry(firstName, lastName, type, amount, date);
+    }
+    
 }
 
 /** 
@@ -249,7 +307,6 @@ void RecordsManager::printEntry(string firstName, string lastName, string type, 
          << left << setw(40) << setfill('_') << "Amount: " << amount << endl
          << left << setw(40) << setfill('_') << "Date: " << date;
 }
-
 
 /** 
  * @brief loadData Initializes a data object array in the Class for use
@@ -280,40 +337,6 @@ void RecordsManager::loadData()
  */
 void RecordsManager::readRecord(string category)
 {
-}
-
-/**
- * @brief Print out a single row's worth of data from the `printData` Function
- */
-void printVector(vector<string> v, bool newLine, string sep, int index)
-{
-    for (int i = 0; i < v.size(); i++)
-    {
-        // if there is some space between values
-        if (v[i] == " "){continue;}
-        // it is the last element in the array
-        if (i == v.size() - 1){sep = "";}
-        string element = v[i] + sep;
-        if (i == 0){
-            string count = index != 0? to_string(index)+") " : "   ";
-            cout << count;
-        }
-        if (newLine)
-        {
-            cout << left         // Aligns Left (I found this solution at https://stackoverflow.com/questions/14765155/how-can-i-easily-format-my-data-table-in-c)
-                 << setw(6)      // sets width between elements on a line?
-                 << setfill(' ') // fills the blank spaces
-                 << element
-                 << endl;
-        }
-        else
-        {
-            cout << left         // Aligns Left
-                 << setw(10)      // sets width between elements on a line?
-                 << setfill(' ') // fills the blank spaces
-                 << element;
-        }
-    }
 }
 
 /**
