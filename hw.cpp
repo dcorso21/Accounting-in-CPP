@@ -35,15 +35,17 @@ public:
                        categories("firstName, lastName, type, amount, date"){};
 
     vector<string> parseCSVLine(string line);
-    void initRecs();
+    void resetRecords();
     vector<string> categoryVector();
-    void addEntry(string firstName, string lastName, string type, int amount, string date);
+    void addEntry(string firstName, string lastName, string type, string amount, string date);
     void manualEntry();
     void loadData();
     void readRecord(string category);
-    void printEntry(string firstName, string lastName, string type, int amount, string date);
+    void printEntry(string firstName, string lastName, string type, string amount, string date);
     void printData();
     void clearConsole();
+    void manualDeleteEntry();
+    void MainMenu();
 };
 /**
  * @brief This takes a string in CSV format and returns a vector of the items
@@ -53,6 +55,7 @@ vector<string> RecordsManager::parseCSVLine(string line)
 {
     vector<string> values;
     string currentWord = "";
+    char lastChar = '/';
     for (int i = 0; i < line.length(); i++)
     {
         if (line[i] != ' ' && line[i] != ',')
@@ -62,20 +65,52 @@ vector<string> RecordsManager::parseCSVLine(string line)
         }
         else
         {
-            // Save last word and continue
-            values.push_back(currentWord);
+            if (lastChar != ' ' && lastChar != ','){
+                // Save last word and continue
+                values.push_back(currentWord);
+            }
             currentWord = "";
         }
+        lastChar = line[i];
     }
     // Adds last word
     values.push_back(currentWord);
     return values;
 }
 
+
+void RecordsManager::MainMenu(){
+    loadData();
+    cout << "Please type the number of the command you would like to execute:\n\n"
+         << "1) View Database\n"
+         << "2) Add Entry\n"
+         << "3) Delete Entry\n"
+         << "4) Exit\n";
+    int response;
+    cin >> response;
+    switch (response)
+    {
+    case (1):
+        printData();
+        break;
+    case (2):
+        manualEntry();
+        break;
+    case (3):
+        manualDeleteEntry();
+        break;
+    case (4):
+        cout << "Goodbye!";
+        break;
+    default:
+        break;
+    }
+}
+
 /** 
  * @brief Reset database
  */
-void RecordsManager::initRecs()
+void RecordsManager::resetRecords()
 {
     recordWrite.open("records.csv");
     recordWrite << "firstName, lastName, type, amount, date";
@@ -93,7 +128,7 @@ vector<string> RecordsManager::categoryVector()
 /** 
  * @brief adds an entry to the record database and writes to file
  */
-void RecordsManager::addEntry(string firstName, string lastName, string type, int amount, string date)
+void RecordsManager::addEntry(string firstName, string lastName, string type, string amount, string date)
 {
     //  The Python in me wanted to do it this way, but I learned about sstream from the GeeksforGeeks below
     // string entry = firstName + ", " + lastName + ", " + type + ", " + amount + ", " + date + "\n";
@@ -136,7 +171,7 @@ void RecordsManager::manualEntry(){
 
     int confirmation;
     cout << endl;
-    printEntry(firstName, lastName, type, amount, date);
+    printEntry(firstName, lastName, type, to_string(amount), date);
     cout << "\n\nPlease confirm that the above transaction looks correct"
          << "\n1) Looks good (entry WILL be saved)"
          << "\n2) Restart (entry will NOT be saved)"
@@ -147,29 +182,67 @@ void RecordsManager::manualEntry(){
     switch (confirmation)
     {
     case (1):
-        addEntry(firstName, lastName, type, amount, date);
+        addEntry(firstName, lastName, type, to_string(amount), date);
         cout << "Entry Saved!\n Press any button to return to the main screen";
         cin >> exit;
         clearConsole();
-        // Back to home
+        MainMenu();
         break;
     case (2):
         manualEntry(); // Restart
         break;
     case (3):
         clearConsole();
-        // Back to home
+        MainMenu();
         break;
     default:
-        break;
+        MainMenu();
     }
 
+}
+
+/**
+ * @brief User can use this function to delete an entry from the console. 
+ */
+void RecordsManager::manualDeleteEntry(){
+    loadData();
+    printData();
+    cout << "\nPlease enter the index of the entry you wish to delete\n";
+    int response;
+    cin >> response;
+    vector<string> entry = data[response];
+    string firstName, lastName, type, amount, date;
+    firstName = entry[0],
+    lastName = entry[1],
+    type = entry[2],
+    amount = entry[3],
+    date = entry[4],
+    printEntry(firstName, lastName, type, amount, date);
+    cout << "\n\n Are you SURE that you would like to delete the entry above?"
+         << "\n1) Yes"
+         << "\n2) Cancel (Back to Main)\n";
+    int confirmation;
+    cin >> confirmation;
+    clearConsole();
+    string exit;
+    switch (confirmation)
+    {
+        case (1):
+            cout << "\nEntry has been deleted, press any button to return to Main\n";
+            cin >> exit;
+            clearConsole();
+            MainMenu();
+            break;
+        default:
+            MainMenu();
+            break;
+    }
 }
 
 /** 
  * @brief Prints an entry in the database in a pivot-table view
  */
-void RecordsManager::printEntry(string firstName, string lastName, string type, int amount, string date){
+void RecordsManager::printEntry(string firstName, string lastName, string type, string amount, string date){
     cout << left << setw(40) << setfill('_') << "First Name: " << firstName << endl
          << left << setw(40) << setfill('_') << "Last Name: " << lastName << endl
          << left << setw(40) << setfill('_') << "Transaction-type: " << type << endl
@@ -212,7 +285,7 @@ void RecordsManager::readRecord(string category)
 /**
  * @brief Print out a single row's worth of data from the `printData` Function
  */
-void printVector(vector<string> v, bool newLine, string sep)
+void printVector(vector<string> v, bool newLine, string sep, int index)
 {
     for (int i = 0; i < v.size(); i++)
     {
@@ -221,6 +294,10 @@ void printVector(vector<string> v, bool newLine, string sep)
         // it is the last element in the array
         if (i == v.size() - 1){sep = "";}
         string element = v[i] + sep;
+        if (i == 0){
+            string count = index != 0? to_string(index)+") " : "   ";
+            cout << count;
+        }
         if (newLine)
         {
             cout << left         // Aligns Left (I found this solution at https://stackoverflow.com/questions/14765155/how-can-i-easily-format-my-data-table-in-c)
@@ -246,7 +323,7 @@ void RecordsManager::printData()
 {
     for (int i = 0; i < data.size(); i++)
     {
-        printVector(data[i], false, "");
+        printVector(data[i], false, "", i);
         cout << endl;
     }
     return;
@@ -263,10 +340,7 @@ void RecordsManager::clearConsole(){
 int main()
 {
     RecordsManager manage;
-    // manage.addEntry("Andreia", "Biagioni", "Withdrawal", 1400, "10/19/2019");
-    // manage.printData();
-    // manage.loadData();
-    // manage.printData();
-    manage.manualEntry();
+    cout << "Welcome to the Records Manager\n";
+    manage.MainMenu();
     return 0;
 }
